@@ -20,6 +20,7 @@ if correctVersion then
   local character = require 'character'
   local cheat = require 'cheat'
   local player = require 'player'
+  local options = require 'options'
 
   -- XXX Hack for level loading
   Gamestate.Level = Level
@@ -40,7 +41,6 @@ if correctVersion then
     mixpanel.track('game.opened')
 
     -- set settings
-    local options = require 'options'
     options:init()
 
     cli:add_option("-l, --level=NAME", "The level to display")
@@ -145,6 +145,12 @@ if correctVersion then
     if key == "f6" and debugger.on then debug.debug() end
     local button = controls.getButton(key)
     if button then Gamestate.keypressed(button) end
+  end
+  
+  function love.focus(focus)
+      if options.option_map['AUTO PAUSE'] and options.option_map['AUTO PAUSE'].bool then
+          paused = not focus
+      end
   end
 
   function love.draw()

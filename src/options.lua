@@ -24,7 +24,8 @@ function state:init()
         { name = 'FULLSCREEN',         bool  = false         },
         { name = 'MUSIC VOLUME',       range = { 0, 10, 10 } },
         { name = 'SFX VOLUME',         range = { 0, 10, 10 } },
-        { name = 'SHOW FPS',           bool  = false         }
+        { name = 'SHOW FPS',           bool  = false         },
+        { name = 'AUTO PAUSE',         bool  = true          }
     } )
 
     for i,o in pairs( self.options ) do
