@@ -50,7 +50,8 @@ function Enemy.new(node, collider, enemytype)
     assert( enemy.props.damage, "You must provide a 'damage' value for " .. type )
 
     assert( enemy.props.hp, "You must provide a 'hp' ( hit point ) value for " .. type )
-    enemy.hp = enemy.props.hp
+    assert(tonumber(enemy.props.hp),"Hp must be a number")
+    enemy.hp = tonumber(enemy.props.hp)
     
     enemy.position_offset = enemy.props.position_offset or {x=0,y=0}
     
@@ -75,7 +76,7 @@ function Enemy.new(node, collider, enemytype)
     enemy.revivedelay = enemy.props.revivedelay and enemy.props.revivedelay or .5
     
     enemy.state = 'default'
-    enemy.direction = 'left'
+    enemy.direction = node.properties.direction or 'left'
     enemy.offset_hand_right = {}
     enemy.offset_hand_right[1] = enemy.props.hand_x or enemy.width/2
     enemy.offset_hand_right[2] = enemy.props.hand_y or enemy.height/2
@@ -112,6 +113,7 @@ end
 
 function Enemy:hurt( damage )
     if self.props.die_sound then sound.playSfx( self.props.die_sound ) end
+
     if not damage then damage = 1 end
     self.state = 'dying'
     self.hp = self.hp - damage
@@ -181,9 +183,11 @@ function Enemy:collide(node, dt, mtv_x, mtv_y)
          player.current_enemy = self
      end
     
-    if player.current_enemy ~= self then return end
+    if player.current_enemy ~= self then 
+        player.velocity.x = -player.velocity.x/100
+    return end
     
-    local _, _, _, playerBottom = player.bb:bbox()
+    local _, _, _, playerBottom = player.bottom_bb:bbox()
     local _, enemyTop, _, y2 = self.bb:bbox()
     local headsize = (y2 - enemyTop) / 2
 
@@ -217,10 +221,13 @@ function Enemy:collide(node, dt, mtv_x, mtv_y)
         )
     end
 
-    player:die(self.props.damage)
-    player.bb:move(mtv_x, mtv_y)
-    player.velocity.y = -450
-    player.velocity.x = 300 * ( player.position.x < self.position.x and -1 or 1 )
+    if self.props.damage ~= 0 then
+        player:die(self.props.damage)
+        player.top_bb:move(mtv_x, mtv_y)
+        player.bottom_bb:move(mtv_x, mtv_y)
+        player.velocity.y = -450
+        player.velocity.x = 300 * ( player.position.x < self.position.x and -1 or 1 )
+    end
 
 end
 
